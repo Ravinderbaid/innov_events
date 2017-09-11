@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for names in files %}
+	<div class="panel panel-default">
+    	<div class="panel-heading">Panel Heading</div>
+    	<a href= "/events/{{ names.id }}">
+    		<div class="panel-body">
+  				{{ names.event_name }}
+			</div>
+		</a>
+	</div>
+	<br>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+	$("#kk").click(function(e) {
+        var status = document.getElementById("kk").innerHTML; 
+		$.ajax({
+        	type: "POST",
+        	url: "/attend/{{ event_detail.id }}/",
+        	data: {
+        		csrfmiddlewaretoken: "{{ csrf_token }}",
+                'status' : status,
+                user : "{{ user.id }}",
+        	},
+        	success: function(result) {
+        		if(result == 1)
+            		document.getElementById("kk").innerHTML = "Unattend";
+            	else
+            		document.getElementById("kk").innerHTML = "Attend";
+        	},
+        	error: function(result) {
+            	alert('error');
+        	}
+    	});
+	});
+});
+
+</script>
+	<div class="jumbotron">
+	    <div class="container">
+    	    <h2 class="display-3">{{ event_detail.event_name }}</h2>
+        	<p>{{ event_detail.event_description }}</p>
+        	{% csrf_token %}
+        	{% if expired %}
+        		<button class="btn btn-lg btn-primary btn-block" id="kk"  disabled = "True">{{ status }}</button>
+        	{% else %}
+        		<button class="btn btn-lg btn-primary btn-block" id="kk"  >{{ status }}</button>
+        	{% endif %}
+      	</div>
+    </div>
+
+	<div class="panel panel-default">
+    	<div class="panel-heading">Panel Heading</div>
+{% for names in user_list %}
+   		<div class="panel-body">
+			<div class="row">
+            <div class="col-sm-6 blog-main">
+                {{ names.username }}
+            </div>
+            <div class="col-sm-6 blog-main">
+                {% if names.gender %}
+                Male
+                {% else %}
+                Female
+                {% endif %}
+            </div>
+            </div>
+		</div>
+{% endfor %}
+	</div>
+	<br>
+
+{% endblock %}
