@@ -25,6 +25,23 @@ $(document).ready(function(){
         	}
     	});
 	});
+    $("#buy").click(function(e) {
+        $.ajax({
+            type: "POST",
+            url: "/buy/{{ event_detail.id }}/",
+            data: {
+                csrfmiddlewaretoken: "{{ csrf_token }}",
+                user : "{{ user.id }}",
+            },
+            success: function(result) {    
+                    document.getElementById("buy").innerHTML = "Bought";
+                    alert(result);
+            },
+            error: function(result) {
+                alert('error');
+            }
+        });
+    });
 });
 
 </script>
@@ -35,8 +52,14 @@ $(document).ready(function(){
         	{% csrf_token %}
         	{% if expired %}
         		<button class="btn btn-lg btn-primary btn-block" id="kk"  disabled = "True">{{ status }}</button>
-        	{% else %}
+                <button class="btn btn-lg btn-primary btn-block" id="buy"  disabled = "True">{{ buy }}</button>   
+            {% else %}
         		<button class="btn btn-lg btn-primary btn-block" id="kk"  >{{ status }}</button>
+                {% if buy = 'Bought'%}
+                    <button class="btn btn-lg btn-primary btn-block" id="buy"  disabled = "True">{{ buy }}</button>
+                {% else %}
+                    <button class="btn btn-lg btn-primary btn-block" id="buy"  >{{ buy }}</button>
+                {% endif %}
         	{% endif %}
       	</div>
     </div>
@@ -49,15 +72,17 @@ $(document).ready(function(){
             <div class="col-sm-6 blog-main">
                 {{ names.username }}
             </div>
-            <div class="col-sm-6 blog-main">
-                {% if names.gender %}
-                Male
-                {% else %}
+            {% if names.gender %}
+                <div class="col-sm-6 blog-main">
                 Female
-                {% endif %}
+                </div>
+            {% else %}
+                <div class="col-sm-6 blog-main">
+                Male
+                </div>
+            {% endif %}
             </div>
-            </div>
-		</div>
+        </div>
 {% endfor %}
 	</div>
 	<br>

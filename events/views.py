@@ -64,14 +64,19 @@ def events(request,event_id):
 		status = "Attend"
 		user_list=[]
 		expired = False
+		buy = "Buy"
 		users_attend = event_detail.users_attend.split(',')
+		users_bought = event_detail.users_bought.split(',')
 		for user_id in users_attend:
-			user_list.append(User.objects.get(pk=str(user_id)))
-			if user_id == str(request.user.id):
-				status = "Unattend"
+			if user_id:
+				user_list.append(User.objects.get(pk=str(user_id)))
+				if user_id == str(request.user.id):
+					status = "Unattend"
+		if str(request.user.id) in users_bought:
+			buy = "Bought"
 		if datetime.date.today() > event_detail.event_date:
 			expired = True
-		return render(request,'event.html',{'user_list':user_list,'event_detail':event_detail,'status':status,'expired':expired})
+		return render(request,'event.html',{'user_list':user_list,'event_detail':event_detail,'status':status,'expired':expired,'buy':buy})
 	except Exception,e:
 		raise Http404
 
@@ -96,6 +101,25 @@ def attend(request,event_id):
 			else:
 				event_detail.users_attend = str(request.user.id)
 			status = 1
+		event_detail.save()
+		return HttpResponse(status)
+	except Exception,e:
+		raise Http404
+
+@login_required(login_url = '/login/')
+def buy(request,event_id):
+	event_detail=[]
+	try:
+		event_detail = Events.objects.get(pk=event_id)
+		if event_detail.users_bought:
+			event_detail.users_bought+=","+str(request.user.id)
+		else:
+			event_detail.users_bought = str(request.user.id)
+		if str(request.user.gender)== "0":
+			status = "Bought at price -" + str(event_detail.event_price)
+		else:
+			price=float(event_detail.event_price)*0.95
+			status = "Bought at 5 percent discount(gender) - " + str(price)
 		event_detail.save()
 		return HttpResponse(status)
 	except Exception,e:
